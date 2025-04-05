@@ -1,14 +1,14 @@
-from gpiozero import Servo
+from gpiozero import AngularServo
 from time import sleep
 
 myGPIO = 17
 
-myServo = Servo(myGPIO)
+myServo = AngularServo(myGPIO, min_angle=-50, max_angle=70)
 try:
     while True:
-        myServo.min()
+        myServo.angle = -50
         sleep(1)
-        myServo.max()
+        myServo.angle = 70
         sleep(1)
 except KeyboardInterrupt:
     print("Program stopped")
