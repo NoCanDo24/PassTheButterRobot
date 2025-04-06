@@ -1,15 +1,6 @@
-# for futur dumb Leo: to use file in command prompt first type: source venv/bin/activate
-# then you can run the following command:
-# python yolo_detect.py --model=yolo11n_ncnn_model --source=picamera0 --resolution=500x300
-# I think you can figure out what it does (if not, first of all shame on you, after that watch this video again: https://www.youtube.com/watch?v=z70ZrSZNi-8)
-
 import cv2
 import numpy as np
 from ultralytics import YOLO
-
-# Define and parse user input arguments
-
-
 
 # Load the model into memory and get labemap
 model_path = "yolo/yolo11n_ncnn_model"
@@ -23,8 +14,8 @@ picam_idx = 0
 
 # Parse user-specified display resolution
 resize = True
-resW = 700
-resH = 500
+resW = 854
+resH = 480
 
 # Load or initialize image source
 from picamera2 import Picamera2
@@ -38,6 +29,8 @@ bbox_colors = [(164,120,87), (68,148,228), (93,97,209), (178,182,133), (88,159,1
 
 # Initialize control and status variables
 img_count = 0
+
+trackedObjects = ["person", "scissors"]
 
 # Begin inference loop
 while True:
@@ -65,7 +58,7 @@ while True:
 
     # Go through each detection and get bbox coords, confidence, and class
     for i in range(len(detections)):
-        if labels[int(detections[i].cls.item())] != "":
+        if labels[int(detections[i].cls.item())] in trackedObjects:
             
         # Get bounding box coordinates
         # Ultralytics returns results in Tensor format, which have to be converted to a regular Python array
