@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 
+
 # Load the model into memory and get labemap
 model_path = "yolo/yolo11n_ncnn_model"
 
@@ -27,8 +28,6 @@ cap.start()
 bbox_colors = [(164,120,87), (68,148,228), (93,97,209), (178,182,133), (88,159,106), 
               (96,202,231), (159,124,168), (169,162,241), (98,118,150), (172,176,184)]
 
-# Initialize control and status variables
-img_count = 0
 
 trackedObjects = ["person", "scissors"]
 
