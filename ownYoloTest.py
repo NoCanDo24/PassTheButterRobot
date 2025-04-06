@@ -3,13 +3,6 @@
 # python yolo_detect.py --model=yolo11n_ncnn_model --source=picamera0 --resolution=500x300
 # I think you can figure out what it does (if not, first of all shame on you, after that watch this video again: https://www.youtube.com/watch?v=z70ZrSZNi-8)
 
-
-import os
-import sys
-import argparse
-import glob
-import time
-
 import cv2
 import numpy as np
 from ultralytics import YOLO
@@ -32,11 +25,6 @@ picam_idx = 0
 resize = True
 resW = 700
 resH = 500
-
-# Set up recording
-record_name = 'demo1.avi'
-record_fps = 30
-recorder = cv2.VideoWriter(record_name, cv2.VideoWriter_fourcc(*'MJPG'), record_fps, (resW,resH))
 
 # Load or initialize image source
 from picamera2 import Picamera2
@@ -111,7 +99,6 @@ while True:
     # Display detection results
     cv2.putText(frame, f'Number of objects: {object_count}', (10,40), cv2.FONT_HERSHEY_SIMPLEX, .7, (0,255,255), 2) # Draw total number of detected objects
     cv2.imshow('YOLO detection results',frame) # Display image
-    recorder.write(frame)
 
     # If inferencing on individual images, wait for user keypress before moving to next image. Otherwise, wait 5ms before moving to next frame.
     key = cv2.waitKey(5)
@@ -126,5 +113,4 @@ while True:
 
 # Clean up
 cap.stop()
-recorder.release()
 cv2.destroyAllWindows()
