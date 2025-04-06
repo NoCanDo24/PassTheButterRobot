@@ -71,6 +71,7 @@ while True:
 
     # Extract results
     detections = results[0].boxes
+    print(results)
 
     # Initialize variable for basic object counting example
     object_count = 0
