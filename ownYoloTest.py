@@ -71,41 +71,41 @@ while True:
 
     # Extract results
     detections = results[0].boxes
-    print(results)
 
     # Initialize variable for basic object counting example
     object_count = 0
 
     # Go through each detection and get bbox coords, confidence, and class
     for i in range(len(detections)):
-
+        if labels[int(detections[i].cls.item())] == "person":
+            
         # Get bounding box coordinates
         # Ultralytics returns results in Tensor format, which have to be converted to a regular Python array
-        xyxy_tensor = detections[i].xyxy.cpu() # Detections in Tensor format in CPU memory
-        xyxy = xyxy_tensor.numpy().squeeze() # Convert tensors to Numpy array
-        xmin, ymin, xmax, ymax = xyxy.astype(int) # Extract individual coordinates and convert to int
+            xyxy_tensor = detections[i].xyxy.cpu() # Detections in Tensor format in CPU memory
+            xyxy = xyxy_tensor.numpy().squeeze() # Convert tensors to Numpy array
+            xmin, ymin, xmax, ymax = xyxy.astype(int) # Extract individual coordinates and convert to int
 
         # Get bounding box class ID and name
-        classidx = int(detections[i].cls.item())
-        classname = labels[classidx]
+            classidx = int(detections[i].cls.item())
+            classname = labels[classidx]
 
         # Get bounding box confidence
-        conf = detections[i].conf.item()
+            conf = detections[i].conf.item()
 
         # Draw box if confidence threshold is high enough
-        if conf > 0.5:
+            if conf > 0.5:
 
-            color = bbox_colors[classidx % 10]
-            cv2.rectangle(frame, (xmin,ymin), (xmax,ymax), color, 2)
+                color = bbox_colors[classidx % 10]
+                cv2.rectangle(frame, (xmin,ymin), (xmax,ymax), color, 2)
 
-            label = f'{classname}: {int(conf*100)}%'
-            labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1) # Get font size
-            label_ymin = max(ymin, labelSize[1] + 10) # Make sure not to draw label too close to top of window
-            cv2.rectangle(frame, (xmin, label_ymin-labelSize[1]-10), (xmin+labelSize[0], label_ymin+baseLine-10), color, cv2.FILLED) # Draw white box to put label text in
-            cv2.putText(frame, label, (xmin, label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1) # Draw label text
+                label = f'{classname}: {int(conf*100)}%'
+                labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1) # Get font size
+                label_ymin = max(ymin, labelSize[1] + 10) # Make sure not to draw label too close to top of window
+                cv2.rectangle(frame, (xmin, label_ymin-labelSize[1]-10), (xmin+labelSize[0], label_ymin+baseLine-10), color, cv2.FILLED) # Draw white box to put label text in
+                cv2.putText(frame, label, (xmin, label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1) # Draw label text
 
             # Basic example: count the number of objects in the image
-            object_count = object_count + 1
+                object_count = object_count + 1
 
     # Calculate and draw framerate (if using video, USB, or Picamera source)    
     # Display detection results
