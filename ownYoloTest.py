@@ -65,7 +65,7 @@ while True:
 
     # Go through each detection and get bbox coords, confidence, and class
     for i in range(len(detections)):
-        if labels[int(detections[i].cls.item())] == "person":
+        if labels[int(detections[i].cls.item())] != "":
             
         # Get bounding box coordinates
         # Ultralytics returns results in Tensor format, which have to be converted to a regular Python array
