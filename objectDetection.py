@@ -91,7 +91,7 @@ d = objectDetection(trackedObjects=["person", "bowl"])
 while True:
     try:
         box = d.getBoxes()
-        print(box)
+        if len(box) > 0:  print(box[0].label, box[0].xmin, box[0].xmax)
     except KeyboardInterrupt:
         print("Program stopped")
         break
