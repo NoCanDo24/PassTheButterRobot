@@ -12,19 +12,10 @@ class objectDetection:
     model = YOLO(model_path, task='detect')
     labels = model.names
 
-    source_type = 'picamera'
-    picam_idx = 0
-
-
     # Parse user-specified display resolution
-    resize = True
-    resW = 854
-    resH = 480
 
     # Load or initialize image source
-    cap = Picamera2()
-    cap.configure(cap.create_video_configuration(main={"format": 'XRGB8888', "size": (resW, resH)}))
-    cap.start()
+    
 
     # Set bounding box colors (using the Tableu 10 color scheme)
     bbox_colors = [(164,120,87), (68,148,228), (93,97,209), (178,182,133), (88,159,106), 
@@ -32,6 +23,14 @@ class objectDetection:
 
     def __init__(self, trackedObjects=labels):
         self.trackedObjects = trackedObjects
+        self.resize = True
+        self.resW = 854
+        self.resH = 480
+        
+        self.cap = Picamera2()
+        self.cap.configure(self.cap.create_video_configuration(main={"format": 'XRGB8888', "size": (self.resW, self.resH)}))
+        self.cap.start()
+
 
     def getBoxes(self):
         
@@ -47,7 +46,10 @@ class objectDetection:
         # Resize frame to desired display resolution
         if self.resize == True:
             frame = cv2.resize(frame,(self.resW, self.resH))
+        
+        cv2.imshow('YOLO detection results',frame) # Display image
 
+        
         # Run inference on frame
         results = self.model(frame, verbose=False)
 
@@ -86,9 +88,8 @@ class objectDetection:
                     cv2.rectangle(frame, (xmin, label_ymin-labelSize[1]-10), (xmin+labelSize[0], label_ymin+baseLine-10), color, cv2.FILLED) # Draw white box to put label text in
                     cv2.putText(frame, label, (xmin, label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1) # Draw label text
         
-        cv2.imshow('YOLO detection results',frame) # Display image
 
-        return resultArr
+        return resultArr, frame
 
 class detection:
     def __init__(self, xmin, ymin, xmax, ymax, label, confidence):
@@ -99,12 +100,3 @@ class detection:
         self.label = label
         self.confidence = confidence
 
-d = objectDetection(trackedObjects=["person", "bowl"])
-
-while True:
-    try:
-        box = d.getBoxes()
-        if len(box) > 0:  print(box[0].label, box[0].xmin, box[0].xmax)
-    except KeyboardInterrupt:
-        print("Program stopped")
-        break
