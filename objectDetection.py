@@ -46,7 +46,8 @@ class objectDetection:
         # Resize frame to desired display resolution
         frame = cv2.resize(frame,(self.resW, self.resH))
         
-        
+        resX, resY = frame.size
+        print(resX, resY)
         # Run inference on frame
         results = self.model(frame, verbose=False)
 
