@@ -6,6 +6,7 @@ d = objectDetection.objectDetection(trackedObjects=["person"])
 while True:
     try:
         detections, frame = d.getBoxes()
+        cv2.imshow('detection Results', frame)
 
         if len(detections) > 0:  
             for i in range(len(detections)):
@@ -17,4 +18,8 @@ while True:
                 print(positionX, positionY)
     except KeyboardInterrupt:
         print("Program stopped")
+        
+        d.cap.stop()
+        cv2.destroyAllWindows()
+        
         break

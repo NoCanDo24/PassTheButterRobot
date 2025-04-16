@@ -23,7 +23,7 @@ class objectDetection:
 
     def __init__(self, trackedObjects=labels):
         self.trackedObjects = trackedObjects
-        self.resize = True
+        self.resize = False
         self.resW = 854
         self.resH = 480
         
@@ -42,13 +42,12 @@ class objectDetection:
         if (frame is None):
             print('Unable to read frames from the Picamera. This indicates the camera is disconnected or not working. Exiting program.')
             return
+        
 
         # Resize frame to desired display resolution
         if self.resize == True:
             frame = cv2.resize(frame,(self.resW, self.resH))
         
-        cv2.imshow('YOLO detection results',frame) # Display image
-
         
         # Run inference on frame
         results = self.model(frame, verbose=False)
@@ -56,8 +55,6 @@ class objectDetection:
         # Extract results
         detections = results[0].boxes
 
-        bbox_colors = [(164,120,87), (68,148,228), (93,97,209), (178,182,133), (88,159,106), 
-                    (96,202,231), (159,124,168), (169,162,241), (98,118,150), (172,176,184)]
 
         for i in range(len(detections)):
             if self.labels[int(detections[i].cls.item())] in self.trackedObjects:
@@ -79,7 +76,7 @@ class objectDetection:
 
                 if conf > 0.5:
 
-                    color = bbox_colors[classidx % 10]
+                    color = self.bbox_colors[classidx % 10]
                     cv2.rectangle(frame, (xmin,ymin), (xmax,ymax), color, 2)
 
                     label = f'{classname}: {int(conf*100)}%'
@@ -88,7 +85,8 @@ class objectDetection:
                     cv2.rectangle(frame, (xmin, label_ymin-labelSize[1]-10), (xmin+labelSize[0], label_ymin+baseLine-10), color, cv2.FILLED) # Draw white box to put label text in
                     cv2.putText(frame, label, (xmin, label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1) # Draw label text
         
-
+        key = cv2.waitKey(5)
+        
         return resultArr, frame
 
 class detection:
@@ -99,4 +97,5 @@ class detection:
         self.ymax = ymax
         self.label = label
         self.confidence = confidence
+
 
