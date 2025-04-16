@@ -69,9 +69,11 @@ class objectDetection:
             # Get bounding box confidence
                 conf = detections[i].conf.item()
                 
-                resultArr.append(detection(xmin, ymin, xmax, ymax, classname, conf))
 
                 if conf > 0.5:
+
+                    resultArr.append(detection(xmin, ymin, xmax, ymax, classname, conf))
+
 
                     color = self.bbox_colors[classidx % 10]
                     cv2.rectangle(frame, (xmin,ymin), (xmax,ymax), color, 2)

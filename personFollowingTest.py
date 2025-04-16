@@ -13,9 +13,6 @@ while True:
                 positionX = detections[i].xmin + (detections[i].xmax - detections[i].xmin)/2
                 positionY = detections[i].ymin + (detections[i].ymax - detections[i].ymin)/2
                 
-
-                
-                print(detections[i].xmin, detections[i].xmax, detections[i].ymin, detections[i].ymax)
                 print(positionX, positionY)
     except KeyboardInterrupt:
         print("Program stopped")
