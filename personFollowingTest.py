@@ -11,7 +11,7 @@ while True:
         if len(detections) > 0:  
             for i in range(len(detections)):
                 positionX = detections[i].xmin + (detections[i].xmax - detections[i].xmin)/2
-                positionY = detections[i].ymin + (detections[i].ymax + detections[i].ymin)/2
+                positionY = detections[i].ymin + (detections[i].ymax - detections[i].ymin)/2
                 
 
                 
