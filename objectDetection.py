@@ -23,7 +23,6 @@ class objectDetection:
 
     def __init__(self, trackedObjects=labels):
         self.trackedObjects = trackedObjects
-        self.resize = False
         self.resW = 854
         self.resH = 480
         
@@ -45,8 +44,7 @@ class objectDetection:
         
 
         # Resize frame to desired display resolution
-        if self.resize == True:
-            frame = cv2.resize(frame,(self.resW, self.resH))
+        frame = cv2.resize(frame,(self.resW, self.resH))
         
         
         # Run inference on frame
@@ -97,5 +95,3 @@ class detection:
         self.ymax = ymax
         self.label = label
         self.confidence = confidence
-
-
