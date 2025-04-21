@@ -11,10 +11,10 @@ while True:
 
         if len(detections) > 0:  
             for i in range(len(detections)):
-                positionX = detections[i].xmin + (detections[i].xmax - detections[i].xmin)/2
-                positionY = detections[i].ymin + (detections[i].ymax - detections[i].ymin)/2
+                positionX = int(detections[i].xmin + (detections[i].xmax - detections[i].xmin)/2)
+                positionY = int(detections[i].ymin + (detections[i].ymax - detections[i].ymin)/2)
 
-                cv2.rectangle(frame, (positionX - 10, positionY + 10), (positionX + 10, positionY - 10), (255,0,0), cv2.FILLED) # Draw white box to put label text in
+                cv2.rectangle(frame, (positionX-10, positionY-10), (positionX+10, positionY+10), (255,0,0), cv2.FILLED) # Draw white box to put label text in
 
                 
                 print(positionX, positionY)
