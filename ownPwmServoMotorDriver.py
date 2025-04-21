@@ -1,13 +1,17 @@
-from gpiozero import PWMOurputDevice
+from gpiozero import PWMOutputDevice
+from time import sleep
 
-pwm = PWMOurputDevice(17)
+pwm = PWMOutputDevice(17)
 pwm.frequency = 50
 
 while True:
     try:
-        # pwm.value = 0.1 # duty cycle of 2ms (max)
-        # pwm.value = 0.05 # duty cycle of 1ms (min)
-        pwm.value = 0.075 # duty cycle of 1.5ms (mid)
+        pwm.value = 0.13 # duty cycle of 2.6ms (max)
+        sleep(1)
+        pwm.value = 0.03 # duty cycle of 0.6ms (min)
+        sleep(1)
+        pwm.value = 0.08 # duty cycle of 1.5ms (mid)
+        sleep(1)
 
 
     except KeyboardInterrupt:
