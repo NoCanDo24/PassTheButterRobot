@@ -33,7 +33,7 @@ def set_step(w1, w2, w3, w4):
 
 def step_motor(steps, direction=1, delay=0.01):
     ENA.value = 1  # Enable Motor 1
-    ENB.value = 1  # Enable Motor 2
+    # ENB.value = 1  # Enable Motor 2
     for _ in range(steps):
         for step in (step_sequence if direction > 0 else reversed_step_sequence):
             set_step(*step)

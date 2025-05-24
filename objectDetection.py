@@ -6,22 +6,16 @@ from picamera2 import Picamera2
 
 class objectDetection:
 
-    # Load the model into memory and get labemap
-    model_path = "yolo/yolo11n_ncnn_model"
-
-    model = YOLO(model_path, task='detect')
-    labels = model.names
-
-    # Parse user-specified display resolution
-
-    # Load or initialize image source
-    
-
     # Set bounding box colors (using the Tableu 10 color scheme)
     bbox_colors = [(164,120,87), (68,148,228), (93,97,209), (178,182,133), (88,159,106), 
                   (96,202,231), (159,124,168), (169,162,241), (98,118,150), (172,176,184)]
 
-    def __init__(self, trackedObjects=labels):
+    def __init__(self, trackedObjects=[], model_path="coco"):
+        # Load the model into memory and get labemap
+        model_path = f"yolo_models/{model_path}_ncnn_model"
+        self.model = YOLO(model_path, task='detect')
+        self.labels = self.model.names
+        
         self.trackedObjects = trackedObjects
         self.resW = 854
         self.resH = 480
@@ -54,7 +48,7 @@ class objectDetection:
 
 
         for i in range(len(detections)):
-            if self.labels[int(detections[i].cls.item())] in self.trackedObjects:
+            if self.labels[int(detections[i].cls.item())] in self.trackedObjects or len(self.trackedObjects) == 0:
 
             # Get bounding box coordinates
             # Ultralytics returns results in Tensor format, which have to be converted to a regular Python array

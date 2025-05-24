@@ -1,11 +1,12 @@
 import objectDetection
 import cv2
 
-d = objectDetection.objectDetection(trackedObjects=["person"])
+b = objectDetection.objectDetection(model_path="coco")
+#p = objectDetection.objectDetection(model_path="coco")
 
 while True:
     try:
-        detections, frame = d.getBoxes()
+        detections, frame = b.getBoxes()
 
 
 
@@ -14,17 +15,16 @@ while True:
                 positionX = int(detections[i].xmin + (detections[i].xmax - detections[i].xmin)/2)
                 positionY = int(detections[i].ymin + (detections[i].ymax - detections[i].ymin)/2)
 
-                cv2.rectangle(frame, (positionX-10, positionY-10), (positionX+10, positionY+10), (255,0,0), cv2.FILLED) # Draw white box to put label text in
+                cv2.rectangle(frame, (positionX-10, positionY-10), (positionX+10, positionY+10), (255,0,0), cv2.FILLED)
 
                 
-                print(positionX, positionY)
 
         cv2.imshow('detection Results', frame)
 
     except KeyboardInterrupt:
         print("Program stopped")
         
-        d.cap.stop()
+        b.cap.stop()
         cv2.destroyAllWindows()
         
         break

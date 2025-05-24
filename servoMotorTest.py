@@ -7,8 +7,8 @@ myServo = AngularServo(myGPIO, min_angle=-50, max_angle=70)
 try:
     while True:
         myServo.angle = -50
-        sleep(1)
+        sleep(2)
         myServo.angle = 70
-        sleep(1)
+        sleep(2)
 except KeyboardInterrupt:
     print("Program stopped")
