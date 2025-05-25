@@ -1,7 +1,7 @@
 import objectDetection
 import cv2
 
-b = objectDetection.objectDetection(model_path="butter_person")
+b = objectDetection.objectDetection(model_path="person_butter")
 #p = objectDetection.objectDetection(model_path="coco")
 
 while True:
