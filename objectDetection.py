@@ -17,7 +17,7 @@ class objectDetection:
         self.labels = self.model.names
         
         self.trackedObjects = trackedObjects
-        self.resW = 854
+        self.resW = 480
         self.resH = 480
         
         self.cap = Picamera2()

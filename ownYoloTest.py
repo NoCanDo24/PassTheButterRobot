@@ -1,108 +1,109 @@
 import cv2
 import numpy as np
 from ultralytics import YOLO
-
-
-# Load the model into memory and get labemap
-model_path = "yolo/yolo11n_ncnn_model"
-
-model = YOLO(model_path, task='detect')
-labels = model.names
-
-source_type = 'picamera'
-picam_idx = 0
-
-
-# Parse user-specified display resolution
-resize = True
-resW = 854
-resH = 480
-
-# Load or initialize image source
 from picamera2 import Picamera2
-cap = Picamera2()
-cap.configure(cap.create_video_configuration(main={"format": 'XRGB8888', "size": (resW, resH)}))
-cap.start()
-
-# Set bounding box colors (using the Tableu 10 color scheme)
-bbox_colors = [(164,120,87), (68,148,228), (93,97,209), (178,182,133), (88,159,106), 
-              (96,202,231), (159,124,168), (169,162,241), (98,118,150), (172,176,184)]
 
 
-trackedObjects = ["person", "scissors"]
+class objectDetection:
 
-# Begin inference loop
+    # Set bounding box colors (using the Tableu 10 color scheme)
+    bbox_colors = [(164,120,87), (68,148,228), (93,97,209), (178,182,133), (88,159,106), 
+                  (96,202,231), (159,124,168), (169,162,241), (98,118,150), (172,176,184)]
+
+    def __init__(self, trackedObjects=[], model_path="coco"):
+        # Load the model into memory and get labemap
+        temp = YOLO(f"yolo_models_pt_format/{model_path}.pt")
+        temp.export(format="ncnn")
+        self.model_path = f"yolo_models_pt_format/{model_path}_ncnn_model"
+        self.model = YOLO(self.model_path, task='detect')
+        self.labels = self.model.names
+        
+        self.trackedObjects = trackedObjects
+        self.resW = 480
+        self.resH = 480
+        
+        self.cap = Picamera2()
+        self.cap.configure(self.cap.create_video_configuration(main={"format": 'XRGB8888', "size": (self.resW, self.resH)}))
+        self.cap.start()
+
+
+    def getBoxes(self):
+        
+        resultArr = []
+
+        # Load frame from image source
+        frame_bgra = self.cap.capture_array()
+        frame = cv2.cvtColor(np.copy(frame_bgra), cv2.COLOR_BGRA2BGR)
+        if (frame is None):
+            print('Unable to read frames from the Picamera. This indicates the camera is disconnected or not working. Exiting program.')
+            return
+        
+
+        # Resize frame to desired display resolution
+        frame = cv2.resize(frame,(self.resW, self.resH))
+        
+        # Run inference on frame
+        results = self.model(frame, verbose=False)
+
+        # Extract results
+        detections = results[0].boxes
+
+
+        for i in range(len(detections)):
+            if self.labels[int(detections[i].cls.item())] in self.trackedObjects or len(self.trackedObjects) == 0:
+
+            # Get bounding box coordinates
+            # Ultralytics returns results in Tensor format, which have to be converted to a regular Python array
+                xyxy_tensor = detections[i].xyxy.cpu() # Detections in Tensor format in CPU memory
+                xyxy = xyxy_tensor.numpy().squeeze() # Convert tensors to Numpy array
+                xmin, ymin, xmax, ymax = xyxy.astype(int) # Extract individual coordinates and convert to int
+
+            # Get bounding box class ID and name
+                classidx = int(detections[i].cls.item())
+                classname = self.labels[classidx]
+
+            # Get bounding box confidence
+                conf = detections[i].conf.item()
+                
+
+                if conf > 0.5:
+
+                    resultArr.append(detection(xmin, ymin, xmax, ymax, classname, conf))
+
+
+                    color = self.bbox_colors[classidx % 10]
+                    cv2.rectangle(frame, (xmin,ymin), (xmax,ymax), color, 2)
+
+                    label = f'{classname}: {int(conf*100)}%'
+                    labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1) # Get font size
+                    label_ymin = max(ymin, labelSize[1] + 10) # Make sure not to draw label too close to top of window
+                    cv2.rectangle(frame, (xmin, label_ymin-labelSize[1]-10), (xmin+labelSize[0], label_ymin+baseLine-10), color, cv2.FILLED) # Draw white box to put label text in
+                    cv2.putText(frame, label, (xmin, label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1) # Draw label text
+        
+        key = cv2.waitKey(5)
+        
+        return resultArr, frame
+
+class detection:
+    def __init__(self, xmin, ymin, xmax, ymax, label, confidence):
+        self.xmin = xmin
+        self.ymin = ymin
+        self.xmax = xmax
+        self.ymax = ymax
+        self.label = label
+        self.confidence = confidence
+
+d = objectDetection(model_path="butter_person_v1")
+
 while True:
-
-
-    # Load frame from image source
-    frame_bgra = cap.capture_array()
-    frame = cv2.cvtColor(np.copy(frame_bgra), cv2.COLOR_BGRA2BGR)
-    if (frame is None):
-        print('Unable to read frames from the Picamera. This indicates the camera is disconnected or not working. Exiting program.')
+    try:
+        result, frame = d.getBoxes()
+        cv2.imshow("detection", frame)
+    except KeyboardInterrupt:
+        print("Program stopped")
+        
+        d.cap.stop()
+        cv2.destroyAllWindows()
+        
         break
-
-    # Resize frame to desired display resolution
-    if resize == True:
-        frame = cv2.resize(frame,(resW,resH))
-
-    # Run inference on frame
-    results = model(frame, verbose=False)
-
-    # Extract results
-    detections = results[0].boxes
-
-    # Initialize variable for basic object counting example
-    object_count = 0
-
-    # Go through each detection and get bbox coords, confidence, and class
-    for i in range(len(detections)):
-        if labels[int(detections[i].cls.item())] in trackedObjects:
-            
-        # Get bounding box coordinates
-        # Ultralytics returns results in Tensor format, which have to be converted to a regular Python array
-            xyxy_tensor = detections[i].xyxy.cpu() # Detections in Tensor format in CPU memory
-            xyxy = xyxy_tensor.numpy().squeeze() # Convert tensors to Numpy array
-            xmin, ymin, xmax, ymax = xyxy.astype(int) # Extract individual coordinates and convert to int
-
-        # Get bounding box class ID and name
-            classidx = int(detections[i].cls.item())
-            classname = labels[classidx]
-
-        # Get bounding box confidence
-            conf = detections[i].conf.item()
-
-        # Draw box if confidence threshold is high enough
-            if conf > 0.5:
-
-                color = bbox_colors[classidx % 10]
-                cv2.rectangle(frame, (xmin,ymin), (xmax,ymax), color, 2)
-
-                label = f'{classname}: {int(conf*100)}%'
-                labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1) # Get font size
-                label_ymin = max(ymin, labelSize[1] + 10) # Make sure not to draw label too close to top of window
-                cv2.rectangle(frame, (xmin, label_ymin-labelSize[1]-10), (xmin+labelSize[0], label_ymin+baseLine-10), color, cv2.FILLED) # Draw white box to put label text in
-                cv2.putText(frame, label, (xmin, label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1) # Draw label text
-
-            # Basic example: count the number of objects in the image
-                object_count = object_count + 1
-
-    # Calculate and draw framerate (if using video, USB, or Picamera source)    
-    # Display detection results
-    cv2.putText(frame, f'Number of objects: {object_count}', (10,40), cv2.FONT_HERSHEY_SIMPLEX, .7, (0,255,255), 2) # Draw total number of detected objects
-    cv2.imshow('YOLO detection results',frame) # Display image
-
-    # If inferencing on individual images, wait for user keypress before moving to next image. Otherwise, wait 5ms before moving to next frame.
-    key = cv2.waitKey(5)
-    
-    if key == ord('q') or key == ord('Q'): # Press 'q' to quit
-        break
-    elif key == ord('s') or key == ord('S'): # Press 's' to pause inference
-        cv2.waitKey()
-    elif key == ord('p') or key == ord('P'): # Press 'p' to save a picture of results on this frame
-        cv2.imwrite('capture.png',frame)
-    
-
-# Clean up
-cap.stop()
-cv2.destroyAllWindows()
+        
