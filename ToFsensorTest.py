@@ -5,12 +5,13 @@ import time
 ser = serial.Serial('/dev/serial0', 115200)
 
 def parse_data(data):
-    if data[0] == 0x59 and data[1] == 0x59:
-        distance = data[2] + data[3] * 256
-        return distance
+	if data[0] == 0x59 and data[1] == 0x59:
+		distance = data[2] + data[3] * 256
+		return distance
 	else:
 		ser.read(1)
-    return None
+	return None
+	
 
 ser.reset_input_buffer()
 
