@@ -4,3 +4,5 @@ __pycache__/
 __pycache__/*
 yolo_models/
 yolo_models/*
+venv/
+venv/*
