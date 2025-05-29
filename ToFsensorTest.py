@@ -16,7 +16,6 @@ def parse_data(data):
 ser.reset_input_buffer()
 
 while True:
-	print(ser.in_waiting)
 	
 	if ser.in_waiting >= 9:
 		raw = ser.read(9)
