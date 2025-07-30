@@ -3,37 +3,32 @@ from gpiozero import PWMOutputDevice
 
 class ServoMotor:
 
-    def __init__(self, pin, frequency=50, min_cycle=0.03, mid_cycle=0.08, max_cycle=0.13, min_angle=-90, max_angle=90):
+    def __init__(self, pin, frequency=50, min_cycle=0.5, max_cycle=2.5, angle_range=270):
         self.pin = pin
         self.pwm = PWMOutputDevice(pin)
         self.frequency = frequency
         self.pwm.frequency = frequency
 
         self.min = min_cycle
-        self.mid = mid_cycle
         self.max = max_cycle
 
-        self.min_angle = min_angle
-        self.max_angle = max_angle
+        self.angle_range = angle_range
 
-        self.pwm.value = self.mid
+        
     
     def updateAngle(self, angle):
-        if angle >= self.min_angle and angle <= self.max_angle:
-            duty_cycle = self.angleToDutycycle(angle)
+        ms = angle * (self.max - self.min)/self.angle_range + self.min
+        self.pwm.value = self.msToValue(ms)
 
-    def angleToDutycycle(self, angle):
-        return 0
+    def msToValue(self, ms):
+        return ms*0.001*self.frequency
 
-
+s = ServoMotor(2)
 while True:
     try:
-        pwm.value = 0.13 # duty cycle of 2.6ms (max)
-        sleep(1)
-        pwm.value = 0.03 # duty cycle of 0.6ms (min)
-        sleep(1)
-        pwm.value = 0.08 # duty cycle of 1.5ms (mid)
-        sleep(1)
+        angleInput = int(input("What angle do you want?"))
+        s.updateAngle()
+
 
 
     except KeyboardInterrupt:
