@@ -1,4 +1,5 @@
 from gpiozero import DigitalInputDevice
+from signal import pause
 
 right_a = DigitalInputDevice(5)
 right_b = DigitalInputDevice(6)
@@ -28,6 +29,8 @@ right_a.when_activated = handle_encoder_right
 right_a.when_deactivated = handle_encoder_right
 right_b.when_activated = handle_encoder_right
 right_b.when_deactivated = handle_encoder_right
+
+pause()
 
 # left_a.when_activated = handle_encoder
 # left_a.when_deactivated = handle_encoder
